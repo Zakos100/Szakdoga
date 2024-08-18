@@ -11,17 +11,16 @@ namespace MauiApp1.Database
     {
 
         private readonly SQLiteConnection _connetion;
-        public static string DB_Name { get; }
-        = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WorkersDB.db");
-        
+
+        public static string DB_Name { get; } = System.IO.Path.Combine("D:\\egyetem\\VS\\repos\\MauiApp1\\MauiApp1", "WorkersDB");
+
 
         public LocalDBService()
         {
             _connetion = new SQLiteConnection(DB_Name);
-            _connetion.CreateTable<Users>();
         }
 
-        public List<Users> List()
+        public List<Users> ListUsers()
         {
             return _connetion.Table<Users>().ToList();
         }

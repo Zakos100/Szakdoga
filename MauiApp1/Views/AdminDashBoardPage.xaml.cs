@@ -36,7 +36,7 @@ public partial class AdminDashBoardPage : ContentPage
 
        
         LocalDBService dBService = new LocalDBService();
-        foreach(var users in dBService.List())
+        foreach(var users in dBService.ListUsers())
         {
             Users.Add(users);
         }

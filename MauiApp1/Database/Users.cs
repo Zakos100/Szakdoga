@@ -16,15 +16,15 @@ namespace MauiApp1.Database
 
         public int UserID { get; set; }
 
-        [Column("UserName")]
+        [Column("Username")]
          
-        public string UserName { get; set; }
+        public string Username { get; set; }
 
-        [Column("UserPassword")]
-        public string UserPassword { get; set; }
+        [Column("Password")]
+        public string Password { get; set; }
 
-        [Column("Email")]
-        public string Email { get; set; }
+        [Column("Fullname")]
+        public string Fullname { get; set; }
 
         [Column("Role")]
         public string Role { get; set; }
