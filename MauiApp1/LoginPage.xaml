@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiApp1.LoginPage"
+             Title="Bejelentkezés"
+             xmlns:viewModels="clr-namespace:MauiApp1"
+             xmlns:local="clr-namespace:MauiApp1.Action"
+             Shell.NavBarIsVisible="False">
+             
+
+    <Grid BackgroundColor="White">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="250"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+
+        <Path Stroke="#000" Fill="blue" Data="m-1.76095,0.25797l1921.79605,0l0,362.95938l-960.89869,90.73994l-960.89848,-90.73994l0.00111,-362.95938l0,0z"/>
+        <Path Stroke="#001" Fill="#fff" Opacity="NaN" Data="m120.39998,34.39999l-7.39998,-2.39999"/>
+
+        <StackLayout>
+
+            <Frame BackgroundColor="Aqua" HeightRequest="60" WidthRequest="60" CornerRadius="30" Padding="0" Margin="0,100,0,0" HorizontalOptions="Center">
+                <Image Source="https://www.findool.com/images/avatars/avatar.png" Aspect="AspectFill" Margin="0">
+                    
+                    
+                </Image>
+                
+            </Frame>
+            
+        </StackLayout>
+
+        <Grid RowSpacing="5" Grid.Row="1" Margin="20,20,20,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+
+            </Grid.RowDefinitions>
+            <Label Grid.Row="1" Text="Üdvözöljük!" HorizontalOptions="Center" FontSize="Title" FontAttributes="Bold" Padding="0" Margin="0"/>
+            <Label Grid.Row="2" Text="Jelentkezzen be a továbblépéshez!" HorizontalOptions="Center" FontSize="Subtitle"/>
+
+            <StackLayout Grid.Row="3" Orientation="Vertical" HorizontalOptions="CenterAndExpand">
+                <Frame BackgroundColor="Transparent" BorderColor="Transparent" Padding="0" HorizontalOptions="FillAndExpand" CornerRadius="30">
+                    <StackLayout Orientation="Horizontal">
+                        <Frame BackgroundColor="Transparent" HeightRequest="40" WidthRequest="40" CornerRadius="30" Padding="5" Margin="5">
+                            <Image Source="user.png" Margin="0"/>
+                        </Frame>
+                        <Entry Text="{Binding Username}" Placeholder="Felhasználó" TextColor="Black" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="FillAndExpand" Margin="0,0,20,0"/>
+                        
+
+                    </StackLayout>
+                </Frame>
+                <Frame BackgroundColor="Transparent" BorderColor="Transparent" Margin="0,15,0,0" Padding="0" HorizontalOptions="FillAndExpand" CornerRadius="30">
+                    <StackLayout Orientation="Horizontal">
+                        <Frame BackgroundColor="Transparent" HeightRequest="40" WidthRequest="40" CornerRadius="40" Padding="5" Margin="5">
+                            <Image Source="lock.png" Aspect="AspectFill" Margin="0"/>
+                        </Frame>
+                        <Entry Placeholder="Jelszó" TextColor="Black" FontAttributes="Bold" VerticalOptions="Center" HorizontalOptions="FillAndExpand" Margin="0,0,20,0"
+                            IsPassword="{Binding Source={x:Reference ShowPasswordActualTrigger}, Path=HidePassword}"/>
+                             <ImageButton VerticalOptions="Center" Margin="0,0,10,0" HeightRequest="20" HorizontalOptions="End" Source="ic_eye_hide.png">
+                               <ImageButton.Triggers>
+                                 <EventTrigger Event="Clicked">
+                                    <local:ShowPasswordTriggerAction
+                                              ShowIcon="ic_eye.png"
+                                              HideIcon="ic_eye_hide.png" 
+                                              x:Name="ShowPasswordActualTrigger"/>
+                                 </EventTrigger>
+                               </ImageButton.Triggers>
+                             </ImageButton>
+                    </StackLayout>
+                </Frame>
+
+
+                <StackLayout Orientation="Horizontal" Margin="10,10,10,10" Padding="0">
+                    <CheckBox IsChecked="False"/>
+                    <Label Text="Emlékezz rám" TextColor="DarkGray" FontSize="Small" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" Margin="0,0,0,0"/>
+                    <Label Text="Elfelejtette a jelszót?" TextColor="DarkGray" FontAttributes="Bold" HorizontalOptions="CenterAndExpand"  VerticalTextAlignment="Center" HorizontalTextAlignment="Center" Margin="10,10,10,10"/>
+
+
+                </StackLayout>
+
+                <Button IsEnabled="True" Text="Bejelentkezés" BackgroundColor="Blue" TextColor="White" FontAttributes="Bold" CornerRadius="30" WidthRequest="200" Margin="0,15,0,0" Command="{Binding LoginCommand}"/>
+
+            </StackLayout>
+        </Grid>
+
+    </Grid>
+    
+</ContentPage>

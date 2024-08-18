@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiApp1.Views.AdminDashBoardPage"
+             Title="Adatbázis kezelés">
+    <FlexLayout Direction="Column">
+        <StackLayout>
+        <CollectionView ItemsSource="{Binding Users}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <StackLayout>
+                        <Label Text="{Binding UserName}" FontSize="17" FontAttributes="Bold"/>
+                        <Label Text="{Binding Email}" FontAttributes="Bold"/>
+                        <Label Text="{Binding Role}" FontAttributes="Bold"/>
+                        <Label Text="{Binding DeviceID}" FontAttributes="Bold"/>
+                    </StackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        </StackLayout>
+    </FlexLayout>
+</ContentPage>

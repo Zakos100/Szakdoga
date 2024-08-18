@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="MauiApp1.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:MauiApp1"
+    Shell.TabBarIsVisible="False">
+
+    <ShellContent
+Title="Login Page"
+FlyoutItemIsVisible="False"
+Shell.FlyoutBehavior="Disabled"
+ContentTemplate="{DataTemplate local:LoginPage}"
+Route="LoginPage"/>
+    
+    
+     
+    <ShellContent
+     FlyoutItemIsVisible="False"
+     Shell.FlyoutBehavior="Disabled"
+     ContentTemplate="{DataTemplate local:LoadingPage}"
+     Route="LoadingPage"/>
+    
+
+    
+    
+    
+
+    <FlyoutItem Route="HomePage" FlyoutDisplayOptions="AsMultipleItems">
+        <ShellContent Title="Kezdőlap"  Icon ="Home.png" ContentTemplate="{DataTemplate local:HomePage}"/>
+        <ShellContent Title="Beállítások" Icon ="Settings.png" ContentTemplate="{DataTemplate local:Settings}"/>
+        <ShellContent Title="A készülékről" Icon="user.png" ContentTemplate="{DataTemplate local:AboutDevices}"/>
+        <ShellContent Title="Időpontok" Icon="clock.png" ContentTemplate="{DataTemplate local:Appointments}"/>
+    </FlyoutItem>
+    <Shell.FlyoutFooter>
+        <StackLayout Padding="20">
+            <Button Text="Sign Out!" Command="{Binding SignOutCommand}"/>
+        </StackLayout>
+    </Shell.FlyoutFooter>
+</Shell>
