@@ -36,6 +36,11 @@ namespace MauiApp1.Viewmodels
                 userDetails.FullName = "Bejelentkezve, mint: \n Zarándi Ákos";
 
                 // Student Role, Teacher Role, Admin Role,
+                List<Users> users = dBService.ListUsers();
+                bool isUserExist = users.Select(user => user.Username).Contains(Username);
+                bool isPaswordCorrect = users.Where(u => u.Username == Username).Select(u => u.Password).FirstOrDefault() == HidePassword;
+
+
                 if (Username.ToLower().Contains("worker"))
                 {
                     userDetails.RoleID = (int)RoleDetails.Worker;
