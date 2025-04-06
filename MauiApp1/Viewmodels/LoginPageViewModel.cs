@@ -11,10 +11,15 @@ using System.Threading.Tasks;
 using MauiApp1.Action;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using MauiApp1.Database;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using MySqlX.XDevAPI;
+using System.Security.Cryptography.X509Certificates;
 
 namespace MauiApp1.Viewmodels
 {
-    public partial class LoginPageViewModel : BaseViewModel
+    public partial class LoginPageViewModel : BaseViewModel 
     {
 
         [ObservableProperty]
@@ -29,11 +34,17 @@ namespace MauiApp1.Viewmodels
 
         public async void Login()
         {
+           
+        
+        LocalDBService dBService = new LocalDBService();
+
             if (!string.IsNullOrWhiteSpace(Username))
             {
                 var userDetails = new UserInfo();
-                userDetails.Username = Username;
-                userDetails.FullName = "Bejelentkezve, mint: \n Zarándi Ákos";
+                userDetails.Username = "Bejelentkezve, mint: \n" + Username;
+
+               
+
 
                 // Student Role, Teacher Role, Admin Role,
                 List<Users> users = dBService.ListUsers();
@@ -46,13 +57,15 @@ namespace MauiApp1.Viewmodels
                     userDetails.RoleID = (int)RoleDetails.Worker;
                     userDetails.RoleText = "Worker";
                 }
-                else if (Username.ToLower().Contains("admin"))
+                else if (isUserExist && isPaswordCorrect)
                 {
                     userDetails.RoleID = (int)RoleDetails.Admin;
                     userDetails.RoleText = "Admin";
                 }
 
-                // calling api 
+              
+
+                // api hívása 
 
 
                 if (Preferences.ContainsKey(nameof(App.UserDetails)))

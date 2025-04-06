@@ -9,11 +9,11 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <StackLayout>
-                        <Label Text="{Binding UserName}" FontSize="17" FontAttributes="Bold"/>
-                        <Label Text="{Binding Email}" FontAttributes="Bold"/>
-                        <Label Text="{Binding Role}" FontAttributes="Bold"/>
-                        <Label Text="{Binding DeviceID}" FontAttributes="Bold"/>
-                    </StackLayout>
+                            <Label Text="{Binding Username, StringFormat='Felhasználónév: {0}'}" FontSize="25" FontAttributes="Bold"/>
+                            <Label Text="{Binding Fullname, StringFormat='Teljes név: {0}'}" FontSize="25" FontAttributes="Bold"/>
+                            <Label Text="{Binding Role, StringFormat='Szerepkör: {0}'}" FontSize="25" FontAttributes="Bold"/>
+                            <Label Text="{Binding DeviceID, StringFormat='Eszköz ID: {0}'}" FontSize="25" FontAttributes="Bold"/>
+                        </StackLayout>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>

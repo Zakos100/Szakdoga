@@ -3,10 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiApp1.AboutDevices"
              Title="AboutDevices">
-    <VerticalStackLayout>
-        <Label 
-            Text="Üdvözöllek az eszközöknél!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    <FlexLayout Direction="Column">
+        <StackLayout>
+            <CollectionView ItemsSource="{Binding Device}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <StackLayout>
+                            <Label Text="{Binding Device_name, StringFormat='Eszköz neve: {0}'}" FontSize="25" FontAttributes="Bold"/>
+                            <Label Text="{Binding Device_type, StringFormat='Eszköz típusa: {0}'}" FontSize="25" FontAttributes="Bold"/>
+                            <Label Text="{Binding MAC_address, StringFormat='MAC-cím: {0}'}" FontSize="25" FontAttributes="Bold"/>
+                            <Label Text="{Binding Last_update, StringFormat='Utolsó frissítés: {0}'}" FontSize="25" FontAttributes="Bold"/>
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </StackLayout>
+    </FlexLayout>
 </ContentPage>

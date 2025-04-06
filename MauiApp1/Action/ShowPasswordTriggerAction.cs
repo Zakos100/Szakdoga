@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace MauiApp1.Action
 {
+
+    // A VÉGÉN NÉZZEM ÁT EZT A KÓDSORT 
     public class ShowPasswordTriggerAction : TriggerAction<ImageButton>, INotifyPropertyChanged
     {
         public string ShowIcon { get; set; }

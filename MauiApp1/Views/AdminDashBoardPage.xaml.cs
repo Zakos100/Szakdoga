@@ -1,47 +1,32 @@
 using MauiApp1.Database;
+using MauiApp1.Models;
+using MauiApp1.Viewmodels;
+using Microsoft.Toolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using Windows.System;
 
 namespace MauiApp1.Views;
 
 public partial class AdminDashBoardPage : ContentPage
 {
-    
 
     public ObservableCollection<Users> Users { get; set; } = new ObservableCollection<Users>();
-    public AdminDashBoardPage()
+
+    public AdminDashBoardPage(LoginPageViewModel viewModel)
     {
-        InitializeComponent();
-        var assembly = IntrospectionExtensions.GetTypeInfo(typeof(AdminDashBoardPage)).Assembly;
         
-        {
-            using (Stream stream = assembly.GetManifestResourceStream("MauiApp1.WorkersDB.db"))
-            if (stream !=null)    
-            {
-                using ( MemoryStream memoryStream = new())
-                    {
-                        stream.CopyTo(memoryStream);
+        InitializeComponent();
+        // this.BindingContext = viewModel;
 
-                        File.WriteAllBytes(LocalDBService.DB_Name, memoryStream.ToArray());
-
-                    }
-                    
-                }
-                else
-                {
-                    
-                }
-        }
-
-       
         LocalDBService dBService = new LocalDBService();
-        foreach(var users in dBService.ListUsers())
-        {
-            Users.Add(users);
-        }
-        BindingContext = this;
 
+        Users loggedInUser = dBService.GetUser(viewModel.Username);
+        Users.Add(loggedInUser);
+        BindingContext = this;
+        
     }
 
 }
