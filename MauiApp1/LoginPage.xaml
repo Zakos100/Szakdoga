@@ -4,7 +4,7 @@
              x:Class="MauiApp1.LoginPage"
              Title="Bejelentkezés"
              xmlns:viewModels="clr-namespace:MauiApp1"
-             xmlns:local="clr-namespace:MauiApp1.Action"             
+             xmlns:local="clr-namespace:MauiApp1.Action"  >
 
     <Grid BackgroundColor="White">
 

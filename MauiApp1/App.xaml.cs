@@ -41,7 +41,7 @@ namespace MauiApp1
         {
             base.OnStart();
 
-            // 🔹 Teljes képernyő mód aktiválása
+            // Teljes képernyő mód aktiválása
             MakeFullScreen();
         }
 
@@ -54,16 +54,16 @@ namespace MauiApp1
 
             if (appWindow is not null)
             {
-                // 🔹 Visszaállítjuk normál módba, hogy megmaradjon az ablakkeret
+                // Visszaállítjuk normál módba, hogy megmaradjon az ablakkeret
                 appWindow.SetPresenter(AppWindowPresenterKind.Overlapped);
 
-                // 🔹 Képernyő méretének lekérése
+                // Képernyő méretének lekérése
                 var displayArea = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary);
                 if (displayArea != null)
                 {
                     var screenBounds = displayArea.WorkArea;
 
-                    // 🔹 Az ablak áthelyezése és átméretezése a teljes képernyőre (de kerettel)
+                    // Az ablak áthelyezése és átméretezése a teljes képernyőre (de kerettel)
                     appWindow.MoveAndResize(new Windows.Graphics.RectInt32
                     {
                         X = screenBounds.X,

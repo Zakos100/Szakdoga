@@ -11,7 +11,6 @@ namespace MauiApp1.Database
     public class Device
     {
         [PrimaryKey]
-        [AutoIncrement]
         [Column("DeviceID")]
 
         public string DeviceID { get; set; }

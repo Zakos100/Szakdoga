@@ -19,7 +19,6 @@ public partial class AdminDashBoardPage : ContentPage
     {
         
         InitializeComponent();
-        // this.BindingContext = viewModel;
 
         LocalDBService dBService = new LocalDBService();
 
