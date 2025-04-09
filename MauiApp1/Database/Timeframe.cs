@@ -14,10 +14,11 @@ namespace MauiApp1.Database
         [AutoIncrement]
         [Column("TimeframeID")]
         public int TimeframeID { get; set; }
-        [Column("Start")]
-        public TimeSpan Start { get; set; }
-        [Column("End")]
-        public TimeSpan End { get; set; }
-        public int Duration => (int)(End - Start).TotalMinutes; 
+        [Column("StartInt")]
+        public int Start { get; set; }
+        [Column("EndInt")]
+        public int End { get; set; }
+        public int Duration => End >= Start ? End - Start : (1440 - Start) + End;
+
     }
 }

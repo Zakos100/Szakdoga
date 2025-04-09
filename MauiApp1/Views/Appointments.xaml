@@ -12,7 +12,7 @@
                     <DataTemplate>
                         <Frame BorderColor="Gray" CornerRadius="10" Padding="10" Margin="5">
                             <VerticalStackLayout>
-                                <Label Text="{Binding UserName}" FontAttributes="Bold" FontSize="18"/>
+                                <Label Text="EDD sorrend" FontAttributes="Bold" FontSize="18"/>
                                 <CollectionView ItemsSource="{Binding AssignedTasks}">
                                     <CollectionView.ItemTemplate>
                                         <DataTemplate>

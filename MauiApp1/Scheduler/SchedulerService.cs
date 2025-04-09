@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MauiApp1.Database;
+using System.Diagnostics;
 
 namespace MauiApp1.Scheduler
 {
@@ -39,47 +40,117 @@ namespace MauiApp1.Scheduler
         public Dictionary<Users, List<Tasks>> AssignTasks()
         {
             var schedule = new Dictionary<Users, List<Tasks>>();
-            var availableTime = userTimeframes.GroupBy(ut => ut.UserID).ToDictionary(g => g.Key,g => g.Sum(ut =>
-        {
-            var tf = timeframes.FirstOrDefault(t => t.TimeframeID == ut.TimeFrameID);
-            return tf?.Duration ?? 0;
-        }) ); // UserID -> szabad idő órában
+            var userFreeBlocks = new Dictionary<int, List<(int start, int end)>>(); // UserID -> szabad idősávok
 
+            // Előkészítjük a szabad idősávokat minden userhez
             foreach (var user in users)
             {
-                var tf = timeframes.FirstOrDefault(t => t.TimeframeID == user.UserID); // feltételezve hogy userID == timeframeID
-                if (tf != null)
-                    availableTime[user.UserID] = tf.Duration;
+                var userTfs = userTimeframes
+                    .Where(ut => ut.UserID == user.UserID)
+                    .Select(ut => timeframes.First(tf => tf.TimeframeID == ut.TimeFrameID));
+
+                var blocks = new List<(int start, int end)>();
+
+                foreach (var tf in userTfs)
+                {
+                    int tfStart = tf.Start;
+                    int tfEnd = tf.End;
+
+                    if (tfEnd >= tfStart)
+                    {
+                        blocks.Add((tfStart * 60, tfEnd * 60));
+                    }
+                    else
+                    {
+                        blocks.Add((tfStart * 60, 1440));
+                        blocks.Add((0, tfEnd * 60));
+                    }
+                }
+
+                userFreeBlocks[user.UserID] = blocks.OrderBy(b => b.start).ToList();
             }
 
-            foreach (var task in tasks)
+            // Taskok EDD szerint rendezve
+            var sortedTasks = tasks.OrderBy(t => t.Deadline).ToList();
+
+            foreach (var task in sortedTasks)
             {
                 var resource = resources.First(r => r.ResourceID == task.ResourceID);
                 var suitability = suitabilityList.First(s => s.SuitabilityID == task.SuitabilityID);
-                var device = devices.First(d => d.DeviceID == task.DeviceID);
 
                 var eligibleUsers = users.Where(u =>
                 {
-                    var userDevice = devices.FirstOrDefault(d => d.DeviceID == u.DeviceID);
-                    if (userDevice == null) return false;
-                    if (userDevice.Device_type != suitability.Device_type) return false;
-                    if (resource.Ability_reg < suitability.Ability_min) return false;
-                    if (!availableTime.ContainsKey(u.UserID)) return false;
-                    return availableTime[u.UserID] >= task.OperationTime; // még mindig kisebb az availableTime mint a task.OperationTime
+                    if (!userFreeBlocks.ContainsKey(u.UserID))
+                        return false;
+
+                    var device = devices.FirstOrDefault(d => d.DeviceID == u.DeviceID);
+                    if (device == null || device.Device_type != suitability.Device_type)
+                        return false;
+
+                    if (resource.Ability_reg < suitability.Ability_min)
+                        return false;
+
+                    return CanFitTask(userFreeBlocks[u.UserID], task.OperationTime * 60);
                 }).ToList();
 
-                if (eligibleUsers.Count == 0) continue; // nem tudtuk kiosztani
+                if (eligibleUsers.Count == 0)
+                    continue;
 
-                var selectedUser = eligibleUsers.OrderBy(u => availableTime[u.UserID]).First();
+                // kiválasztjuk azt, akinél legkevesebb szabad idő marad
+                var selectedUser = eligibleUsers.OrderBy(u =>
+                    userFreeBlocks[u.UserID].Sum(b => b.end - b.start)).First();
+
                 if (!schedule.ContainsKey(selectedUser))
                     schedule[selectedUser] = new List<Tasks>();
 
                 schedule[selectedUser].Add(task);
-                availableTime[selectedUser.UserID] -= task.OperationTime;
+                userFreeBlocks[selectedUser.UserID] = UpdateBlocks(userFreeBlocks[selectedUser.UserID], task.OperationTime * 60);
             }
 
+
+            bool CanFitTask(List<(int start, int end)> blocks, int duration)
+            {
+                int totalAvailable = blocks.Sum(b => b.end - b.start);
+                return totalAvailable >= duration;
+            }
+
+            List<(int start, int end)> UpdateBlocks(List<(int start, int end)> blocks, int duration)
+            {
+                var newBlocks = new List<(int start, int end)>();
+
+                foreach (var block in blocks)
+                {
+                    int blockDuration = block.end - block.start;
+
+                    if (duration <= 0)
+                    {
+                        newBlocks.Add(block); // már kiosztva, marad ahogy van
+                        continue;
+                    }
+
+                    if (blockDuration <= 0)
+                    {
+                        continue;
+                    }
+
+                    if (blockDuration <= duration)
+                    {
+                        // teljes blokkot elhasználjuk
+                        duration -= blockDuration;
+                    }
+                    else
+                    {
+                        // csak részben használjuk fel a blokkot
+                        newBlocks.Add((block.start + duration, block.end));
+                        duration = 0;
+                    }
+                }
+
+                return newBlocks;
+
+            }
             return schedule;
         }
-    }
 
+    }
 }
