@@ -37,12 +37,63 @@ namespace MauiApp1.Scheduler
             this.userTimeframes = userTimeframes;
         }
 
-        public Dictionary<Users, List<Tasks>> AssignTasks()
+        public Dictionary<Users, List<Tasks>> AssignTasks(ScheduleMode mode)
+        {
+            if (mode == ScheduleMode.FlowShop)
+            {
+                return FlowShopSchedule();
+            }
+
+            return RunEDD();
+        }
+
+        private Dictionary<Users, List<Tasks>> FlowShopSchedule()
+        {
+            Debug.WriteLine($"[FlowShop] tasks.Count = {tasks.Count}");
+            Debug.WriteLine($"[FlowShop] users.Count = {users.Count}");
+
+            var operationsPerTask = tasks.Select(t => new
+            {
+                Task = t,
+                Op1 = new Operation { TaskID = t.TaskID, MachineIndex = 1, ProcessingTime = t.OperationTime / 2 },
+                Op2 = new Operation { TaskID = t.TaskID, MachineIndex = 2, ProcessingTime = t.OperationTime / 2 }
+            }).ToList();
+
+            var ordered = operationsPerTask
+                .OrderBy(t => Math.Min(t.Op1.ProcessingTime, t.Op2.ProcessingTime))
+                .ThenBy(t => t.Op1.ProcessingTime < t.Op2.ProcessingTime ? 0 : 1)
+                .Select(t => t.Task)
+                .ToList();
+
+            Debug.WriteLine($"[FlowShop] ordered.Count = {ordered.Count}");
+
+            var demoUser = users.FirstOrDefault();
+            if (demoUser == null)
+            {
+                Debug.WriteLine("[FlowShop] ❌ Nincs demoUser!");
+                return new Dictionary<Users, List<Tasks>>();
+            }
+
+            var schedule = new Dictionary<Users, List<Tasks>>
+            {
+                [demoUser] = ordered
+            };
+
+            Debug.WriteLine($"[FlowShop] schedule tartalma:");
+
+            foreach (var task in ordered)
+                Debug.WriteLine($"TaskID: {task.TaskID}, Deadline: {task.Deadline}");
+
+            return schedule;
+
+          
+        }
+
+        private Dictionary<Users, List<Tasks>> RunEDD()
         {
             var schedule = new Dictionary<Users, List<Tasks>>();
-            var userFreeBlocks = new Dictionary<int, List<(int start, int end)>>(); // UserID -> szabad idősávok
+            var userFreeBlocks = new Dictionary<int, List<(int start, int end)>>();
 
-            // Előkészítjük a szabad idősávokat minden userhez
             foreach (var user in users)
             {
                 var userTfs = userTimeframes
@@ -57,9 +108,7 @@ namespace MauiApp1.Scheduler
                     int tfEnd = tf.End;
 
                     if (tfEnd >= tfStart)
-                    {
                         blocks.Add((tfStart * 60, tfEnd * 60));
-                    }
                     else
                     {
                         blocks.Add((tfStart * 60, 1440));
@@ -68,18 +117,12 @@ namespace MauiApp1.Scheduler
                 }
 
                 userFreeBlocks[user.UserID] = blocks.OrderBy(b => b.start).ToList();
-
-               
             }
 
-            // Taskok EDD szerint rendezve
             var sortedTasks = tasks.OrderBy(t => t.Deadline).ToList();
-
 
             foreach (var task in sortedTasks)
             {
-                
-                
                 var resource = resources.First(r => r.ResourceID == task.ResourceID);
                 var suitability = suitabilityList.First(s => s.SuitabilityID == task.SuitabilityID);
 
@@ -91,7 +134,6 @@ namespace MauiApp1.Scheduler
                     var device = devices.FirstOrDefault(d => d.DeviceID == u.DeviceID);
                     if (device == null || device.Device_type != suitability.Device_type)
                         return false;
-
 
                     if (resource.Ability_reg < suitability.Ability_min)
                     {
@@ -105,7 +147,6 @@ namespace MauiApp1.Scheduler
                 if (eligibleUsers.Count == 0)
                     continue;
 
-                // kiválasztjuk azt, akinél legkevesebb szabad idő marad
                 var selectedUser = eligibleUsers.OrderBy(u =>
                     userFreeBlocks[u.UserID].Sum(b => b.end - b.start)).First();
 
@@ -116,50 +157,44 @@ namespace MauiApp1.Scheduler
                 userFreeBlocks[selectedUser.UserID] = UpdateBlocks(userFreeBlocks[selectedUser.UserID], task.OperationTime * 60);
             }
 
+            return schedule;
+        }
 
-            bool CanFitTask(List<(int start, int end)> blocks, int duration)
+        private bool CanFitTask(List<(int start, int end)> blocks, int duration)
+        {
+            int totalAvailable = blocks.Sum(b => b.end - b.start);
+            return totalAvailable >= duration;
+        }
+
+        private List<(int start, int end)> UpdateBlocks(List<(int start, int end)> blocks, int duration)
+        {
+            var newBlocks = new List<(int start, int end)>();
+
+            foreach (var block in blocks)
             {
-                int totalAvailable = blocks.Sum(b => b.end - b.start);
-                return totalAvailable >= duration;
-            }
+                int blockDuration = block.end - block.start;
 
-            List<(int start, int end)> UpdateBlocks(List<(int start, int end)> blocks, int duration)
-            {
-                var newBlocks = new List<(int start, int end)>();
-
-                foreach (var block in blocks)
+                if (duration <= 0)
                 {
-                    int blockDuration = block.end - block.start;
-
-                    if (duration <= 0)
-                    {
-                        newBlocks.Add(block); // már kiosztva, marad ahogy van
-                        continue;
-                    }
-
-                    if (blockDuration <= 0)
-                    {
-                        continue;
-                    }
-
-                    if (blockDuration <= duration)
-                    {
-                        // teljes blokkot elhasználjuk
-                        duration -= blockDuration;
-                    }
-                    else
-                    {
-                        // csak részben használjuk fel a blokkot
-                        newBlocks.Add((block.start + duration, block.end));
-                        duration = 0;
-                    }
+                    newBlocks.Add(block);
+                    continue;
                 }
 
-                return newBlocks;
+                if (blockDuration <= 0)
+                    continue;
 
+                if (blockDuration <= duration)
+                {
+                    duration -= blockDuration;
+                }
+                else
+                {
+                    newBlocks.Add((block.start + duration, block.end));
+                    duration = 0;
+                }
             }
-            return schedule;
-        } 
 
+            return newBlocks;
+        }
     }
 }

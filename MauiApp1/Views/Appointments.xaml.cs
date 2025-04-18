@@ -1,5 +1,6 @@
 using MauiApp1.Database;
 using MauiApp1.Scheduler;
+using MauiApp1.Services;
 using MauiApp1.Viewmodels;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -9,6 +10,10 @@ namespace MauiApp1;
 public partial class Appointments : ContentPage
 {
     public ObservableCollection<ScheduledTaskViewModel> ScheduleResults { get; set; } = new();
+    public ObservableCollection<ScheduledTaskViewModel> FlowShopScheduleResults { get; set; } = new();
+    public ObservableCollection<FlowShopBarItem> FlowShopBarData { get; set; } = new();
+
+
     private readonly LocalDBService _localDBService;
 
     public Appointments()
@@ -18,6 +23,7 @@ public partial class Appointments : ContentPage
 
         var dbPath = System.IO.Path.Combine("D:\\egyetem\\VS\\repos\\MauiApp1\\MauiApp1", "WorkersDB");
         _localDBService = new LocalDBService(dbPath);
+
     }
 
     protected override async void OnAppearing()
@@ -32,11 +38,12 @@ public partial class Appointments : ContentPage
         var devices = await _localDBService.GetDevicesAsync();
         var userTimeframe = await _localDBService.GetUserTimeframesAsync();
         var scheduler = new SchedulerService(tasks, users, timeframes, suitabilityList, resources, devices, userTimeframe);
-        var schedule = scheduler.AssignTasks();
+        var schedule = scheduler.AssignTasks(ScheduleMode.EDD);
+        var flowSchedule = scheduler.AssignTasks(ScheduleMode.FlowShop);
+
 
         ScheduleResults.Clear();
 
-        ScheduleResults.Clear();
 
         var allTasks = schedule
             .SelectMany(entry => entry.Value)
@@ -45,9 +52,30 @@ public partial class Appointments : ContentPage
 
         ScheduleResults.Add(new ScheduledTaskViewModel
         {
-            UserName = "EDD sorrend", // vagy akár "" ha nem kell cím
             AssignedTasks = allTasks.Select(t =>
                 $"Feladat sorszáma: {t.TaskID} - Deadline: {t.Deadline:yyyy-MM-dd}").ToList()
         });
+
+
+
+        FlowShopScheduleResults.Clear();
+        FlowShopScheduleResults.Add(new ScheduledTaskViewModel
+        {
+            AssignedTasks = flowSchedule
+                .SelectMany(kvp => kvp.Value)
+                .Select(t => $"Feladat sorszáma: {t.TaskID} - Deadline: {t.Deadline:yyyy-MM-dd}")
+                .ToList()
+        });
+
+        FlowShopBarData.Clear();
+        foreach (var task in flowSchedule.SelectMany(kvp => kvp.Value))
+        {
+            FlowShopBarData.Add(new FlowShopBarItem
+            {
+                OperationTime = task.OperationTime,
+                TaskLabel = $"Task {task.TaskID}"
+            });
+        }
+        Debug.WriteLine($"FlowShopBarData darabszám: {FlowShopBarData.Count}");
     }
 }
