@@ -68,13 +68,18 @@ namespace MauiApp1.Scheduler
                 }
 
                 userFreeBlocks[user.UserID] = blocks.OrderBy(b => b.start).ToList();
+
+               
             }
 
             // Taskok EDD szerint rendezve
             var sortedTasks = tasks.OrderBy(t => t.Deadline).ToList();
 
+
             foreach (var task in sortedTasks)
             {
+                
+                
                 var resource = resources.First(r => r.ResourceID == task.ResourceID);
                 var suitability = suitabilityList.First(s => s.SuitabilityID == task.SuitabilityID);
 
@@ -87,8 +92,12 @@ namespace MauiApp1.Scheduler
                     if (device == null || device.Device_type != suitability.Device_type)
                         return false;
 
+
                     if (resource.Ability_reg < suitability.Ability_min)
+                    {
+                        Debug.WriteLine($"KIZÁRVA - TaskID {task.TaskID}: {resource.Ability_reg} < {suitability.Ability_min}");
                         return false;
+                    }
 
                     return CanFitTask(userFreeBlocks[u.UserID], task.OperationTime * 60);
                 }).ToList();
@@ -150,7 +159,7 @@ namespace MauiApp1.Scheduler
 
             }
             return schedule;
-        }
+        } 
 
     }
 }

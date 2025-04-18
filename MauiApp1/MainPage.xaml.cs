@@ -12,10 +12,5 @@ namespace MauiApp1
             InitializeComponent();
 
         }
-
-        private void OnCounterClicked(object sender, EventArgs e)
-        {
-          
-        }
     }
 }

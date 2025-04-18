@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using MySqlX.XDevAPI;
 using System.Security.Cryptography.X509Certificates;
+using MauiApp1.Services;
 
 namespace MauiApp1.Viewmodels
 {
@@ -63,7 +64,11 @@ namespace MauiApp1.Viewmodels
                     userDetails.RoleText = "Admin";
                 }
 
-              
+                var user = dBService.GetUser(Username);
+                if (user != null && user.Password == user.Password)
+                {
+                    AppSession.LoggedInUser = user;
+                }
 
                 // api hívása 
 

@@ -49,7 +49,12 @@ namespace MauiApp1.Database
         public Users GetUser(string username)
         {
             return _connection.Table<Users>().ToList().Where(u => u.Username == username).FirstOrDefault();
-        } 
+        }
+
+        public Device GetDeviceByID(string deviceID)
+        {
+            return _connection.Table<Device>().FirstOrDefault(d => d.DeviceID == deviceID);
+        }
 
         public List<Device> ListDevices()
         {
@@ -91,6 +96,7 @@ namespace MauiApp1.Database
             return _database.Table<UserTimeframes>().ToListAsync();
         }
 
+        
 
 
     }

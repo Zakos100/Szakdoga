@@ -10,7 +10,7 @@
             <CollectionView ItemsSource="{Binding ScheduleResults}">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame BorderColor="Gray" CornerRadius="10" Padding="10" Margin="5">
+                        <Frame>
                             <VerticalStackLayout>
                                 <Label Text="EDD sorrend" FontAttributes="Bold" FontSize="18"/>
                                 <CollectionView ItemsSource="{Binding AssignedTasks}">

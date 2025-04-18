@@ -1,4 +1,6 @@
 using MauiApp1.Database;
+using MauiApp1.Services;
+using MauiApp1.Viewmodels;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Reflection;
@@ -11,37 +13,20 @@ public partial class AboutDevices : ContentPage
     public ObservableCollection<Database.Device> Device { get; set; } = new ObservableCollection<Database.Device>();
 
     [Obsolete]
+
     public AboutDevices()
     {
         InitializeComponent();
-        var assembly = IntrospectionExtensions.GetTypeInfo(typeof(AboutDevices)).Assembly;
-
-        {
-            using (Stream stream = assembly.GetManifestResourceStream("MauiApp1.WorkersDB.db"))
-                if (stream != null)
-                {
-                    using (MemoryStream memoryStream = new())
-                    {
-                        stream.CopyTo(memoryStream);
-
-                        File.WriteAllBytes(LocalDBService.DB_Name, memoryStream.ToArray());
-
-                    }
-
-                }
-                else
-                {
-
-                }
-        }
-
-
         LocalDBService dBService = new LocalDBService();
-        foreach (var device in dBService.ListDevices())
-        {
-            Device.Add(device);
-        }
-        BindingContext = this;
 
+        if (AppSession.LoggedInUser != null && !string.IsNullOrEmpty(AppSession.LoggedInUser.DeviceID))
+        {
+            var device = dBService.GetDeviceByID(AppSession.LoggedInUser.DeviceID);
+            if (device != null)
+                Device.Add(device);
+        }
+
+        BindingContext = this;
     }
+
 }

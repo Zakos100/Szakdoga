@@ -36,13 +36,18 @@ public partial class Appointments : ContentPage
 
         ScheduleResults.Clear();
 
-        foreach (var entry in schedule)
+        ScheduleResults.Clear();
+
+        var allTasks = schedule
+            .SelectMany(entry => entry.Value)
+            .OrderBy(t => t.Deadline)
+            .ToList();
+
+        ScheduleResults.Add(new ScheduledTaskViewModel
         {
-            ScheduleResults.Add(new ScheduledTaskViewModel
-            {
-                UserName = entry.Key.Fullname,
-                AssignedTasks = entry.Value.Select(t => $"TaskID: {t.TaskID} - Deadline: {t.Deadline:yyyy-MM-dd}").ToList()
-            });
-        }
+            UserName = "EDD sorrend", // vagy akár "" ha nem kell cím
+            AssignedTasks = allTasks.Select(t =>
+                $"Feladat sorszáma: {t.TaskID} - Deadline: {t.Deadline:yyyy-MM-dd}").ToList()
+        });
     }
 }
