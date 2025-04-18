@@ -11,7 +11,6 @@ public partial class Appointments : ContentPage
 {
     public ObservableCollection<ScheduledTaskViewModel> ScheduleResults { get; set; } = new();
     public ObservableCollection<ScheduledTaskViewModel> FlowShopScheduleResults { get; set; } = new();
-    public ObservableCollection<FlowShopBarItem> FlowShopBarData { get; set; } = new();
 
 
     private readonly LocalDBService _localDBService;
@@ -67,15 +66,5 @@ public partial class Appointments : ContentPage
                 .ToList()
         });
 
-        FlowShopBarData.Clear();
-        foreach (var task in flowSchedule.SelectMany(kvp => kvp.Value))
-        {
-            FlowShopBarData.Add(new FlowShopBarItem
-            {
-                OperationTime = task.OperationTime,
-                TaskLabel = $"Task {task.TaskID}"
-            });
-        }
-        Debug.WriteLine($"FlowShopBarData darabszám: {FlowShopBarData.Count}");
     }
 }

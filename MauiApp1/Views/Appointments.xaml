@@ -2,16 +2,9 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:MauiApp1"
-             xmlns:services="clr-namespace:MauiApp1.Services"
              x:Class="MauiApp1.Appointments"
              Title="Appointments">
-
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <services:OperationTimeToWidthConverter x:Key="OperationTimeToWidthConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
+    
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="30">
 
@@ -26,8 +19,8 @@
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <VerticalStackLayout>
-                                    <Label Text="{Binding UserName}" FontAttributes="Bold" FontSize="16" HorizontalOptions="Center" />
-                                    <CollectionView ItemsSource="{Binding AssignedTasks}">
+                                    <Label Text="{Binding UserName}" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" />
+                                    <CollectionView ItemsSource="{Binding AssignedTasks}" HeightRequest="300">
                                         <CollectionView.ItemTemplate>
                                             <DataTemplate>
                                                 <Label Text="{Binding .}" FontSize="16" />
@@ -50,8 +43,8 @@
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <VerticalStackLayout>
-                                    <Label Text="{Binding UserName}" FontAttributes="Bold" FontSize="16" HorizontalOptions="Center" />
-                                    <CollectionView ItemsSource="{Binding AssignedTasks}">
+                                    <Label Text="{Binding UserName}" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" />
+                                    <CollectionView ItemsSource="{Binding AssignedTasks}" HeightRequest="300">
                                         <CollectionView.ItemTemplate>
                                             <DataTemplate>
                                                 <Label Text="{Binding .}" FontSize="16" />
@@ -63,29 +56,7 @@
                         </CollectionView.ItemTemplate>
                     </CollectionView>
                 </VerticalStackLayout>
-
             </Grid>
-
-            <!-- Flow Shop Vizualizáció -->
-            <VerticalStackLayout Spacing="10">
-                <Label Text="Flow Shop vizualizáció" FontSize="18" HorizontalOptions="Center" />
-
-                <CollectionView ItemsSource="{Binding FlowShopBarData}" HeightRequest="60">
-                    <CollectionView.ItemsLayout>
-                        <LinearItemsLayout Orientation="Horizontal" />
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <BoxView HeightRequest="40"
-                     WidthRequest="{Binding OperationTime, Converter={StaticResource OperationTimeToWidthConverter}}"
-                     Color="CornflowerBlue"
-                     Margin="5,0"/>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-
-            </VerticalStackLayout>
-
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
