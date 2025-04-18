@@ -3,28 +3,27 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiApp1.Appointments"
              Title="Appointments">
-    <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="20">
-            <Label Text="Ütemezési eredmények" FontSize="24" HorizontalOptions="Center" />
 
-            <CollectionView ItemsSource="{Binding ScheduleResults}">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Frame>
-                            <VerticalStackLayout>
-                                <Label Text="EDD sorrend" FontAttributes="Bold" FontSize="18"/>
-                                <CollectionView ItemsSource="{Binding AssignedTasks}">
-                                    <CollectionView.ItemTemplate>
-                                        <DataTemplate>
-                                            <Label Text="{Binding .}" FontSize="14"/>
-                                        </DataTemplate>
-                                    </CollectionView.ItemTemplate>
-                                </CollectionView>
-                            </VerticalStackLayout>
-                        </Frame>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </VerticalStackLayout>
-    </ScrollView>
+    <VerticalStackLayout Padding="20" Spacing="20">
+        <Label Text="Ütemezési eredmények" FontSize="24" HorizontalOptions="Center" />
+
+        <CollectionView ItemsSource="{Binding ScheduleResults}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <VerticalStackLayout>
+                        <Label Text="EDD sorrend" FontAttributes="Bold" FontSize="18" />
+
+                        <CollectionView ItemsSource="{Binding AssignedTasks}"
+                                        HeightRequest="400"   >
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Label Text="{Binding .}" FontSize="14"/>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
 </ContentPage>
