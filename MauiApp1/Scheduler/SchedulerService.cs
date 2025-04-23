@@ -49,9 +49,6 @@ namespace MauiApp1.Scheduler
 
         private Dictionary<Users, List<Tasks>> FlowShopSchedule()
         {
-            Debug.WriteLine($"[FlowShop] tasks.Count = {tasks.Count}");
-            Debug.WriteLine($"[FlowShop] users.Count = {users.Count}");
-
             var schedule = new Dictionary<Users, List<Tasks>>();
 
             var operationsPerTask = tasks.Select(t => new
@@ -127,14 +124,6 @@ namespace MauiApp1.Scheduler
                     schedule[selectedUser] = new List<Tasks>();
 
                 schedule[selectedUser].Add(task);
-            }
-
-            Debug.WriteLine($"[FlowShop] schedule tartalma:");
-            foreach (var kvp in schedule)
-            {
-                Debug.WriteLine($"User: {kvp.Key.Fullname}");
-                foreach (var task in kvp.Value)
-                    Debug.WriteLine($" - TaskID: {task.TaskID}, Deadline: {task.Deadline}");
             }
 
             return schedule;
