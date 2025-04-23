@@ -52,6 +52,8 @@ namespace MauiApp1.Scheduler
             Debug.WriteLine($"[FlowShop] tasks.Count = {tasks.Count}");
             Debug.WriteLine($"[FlowShop] users.Count = {users.Count}");
 
+            var schedule = new Dictionary<Users, List<Tasks>>();
+
             var operationsPerTask = tasks.Select(t => new
             {
                 Task = t,
@@ -59,34 +61,83 @@ namespace MauiApp1.Scheduler
                 Op2 = new Operation { TaskID = t.TaskID, MachineIndex = 2, ProcessingTime = t.OperationTime / 2 }
             }).ToList();
 
-            var ordered = operationsPerTask
+            var orderedTasks = operationsPerTask
                 .OrderBy(t => Math.Min(t.Op1.ProcessingTime, t.Op2.ProcessingTime))
                 .ThenBy(t => t.Op1.ProcessingTime < t.Op2.ProcessingTime ? 0 : 1)
                 .Select(t => t.Task)
                 .ToList();
 
-            Debug.WriteLine($"[FlowShop] ordered.Count = {ordered.Count}");
-
-            var demoUser = users.FirstOrDefault();
-            if (demoUser == null)
+            foreach (var task in orderedTasks)
             {
-                Debug.WriteLine("[FlowShop] ❌ Nincs demoUser!");
-                return new Dictionary<Users, List<Tasks>>();
+                var resource = resources.FirstOrDefault(r => r.ResourceID == task.ResourceID);
+                var suitability = suitabilityList.FirstOrDefault(s => s.SuitabilityID == task.SuitabilityID);
+
+                if (resource == null || suitability == null)
+                    continue;
+
+                var eligibleUsers = users.Where(u =>
+                {
+                    var device = devices.FirstOrDefault(d => d.DeviceID == u.DeviceID);
+                    if (device == null || device.Device_type != suitability.Device_type)
+                        return false;
+
+                    if (resource.Ability_reg < suitability.Ability_min)
+                        return false;
+
+                    var userTfs = userTimeframes
+                        .Where(ut => ut.UserID == u.UserID)
+                        .Select(ut => timeframes.FirstOrDefault(tf => tf.TimeframeID == ut.TimeFrameID))
+                        .Where(tf => tf != null)
+                        .ToList();
+
+                    var totalMinutesAvailable = userTfs.Sum(tf =>
+                    {
+                        var start = tf.Start;
+                        var end = tf.End;
+                        if (end < start)
+                            return (1440 - start) + end;
+                        return end - start;
+                    });
+
+                    return totalMinutesAvailable >= task.OperationTime;
+                }).ToList();
+
+                if (!eligibleUsers.Any())
+                    continue;
+
+                var selectedUser = eligibleUsers.OrderBy(u =>
+                {
+                    var userTfs = userTimeframes
+                        .Where(ut => ut.UserID == u.UserID)
+                        .Select(ut => timeframes.FirstOrDefault(tf => tf.TimeframeID == ut.TimeFrameID))
+                        .Where(tf => tf != null)
+                        .ToList();
+
+                    return userTfs.Sum(tf =>
+                    {
+                        var start = tf.Start;
+                        var end = tf.End;
+                        if (end < start)
+                            return (1440 - start) + end;
+                        return end - start;
+                    });
+                }).First();
+
+                if (!schedule.ContainsKey(selectedUser))
+                    schedule[selectedUser] = new List<Tasks>();
+
+                schedule[selectedUser].Add(task);
             }
 
-            var schedule = new Dictionary<Users, List<Tasks>>
-            {
-                [demoUser] = ordered
-            };
-
             Debug.WriteLine($"[FlowShop] schedule tartalma:");
-
-            foreach (var task in ordered)
-                Debug.WriteLine($"TaskID: {task.TaskID}, Deadline: {task.Deadline}");
+            foreach (var kvp in schedule)
+            {
+                Debug.WriteLine($"User: {kvp.Key.Fullname}");
+                foreach (var task in kvp.Value)
+                    Debug.WriteLine($" - TaskID: {task.TaskID}, Deadline: {task.Deadline}");
+            }
 
             return schedule;
-
-          
         }
 
         private Dictionary<Users, List<Tasks>> RunEDD()
