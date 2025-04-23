@@ -177,7 +177,6 @@ namespace MauiApp1.Scheduler
 
                     if (resource.Ability_reg < suitability.Ability_min)
                     {
-                        Debug.WriteLine($"KIZÁRVA - TaskID {task.TaskID}: {resource.Ability_reg} < {suitability.Ability_min}");
                         return false;
                     }
 
