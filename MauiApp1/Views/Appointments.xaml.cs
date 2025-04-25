@@ -4,6 +4,7 @@ using MauiApp1.Services;
 using MauiApp1.Viewmodels;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using Windows.System;
 
 namespace MauiApp1;
 
@@ -52,19 +53,20 @@ public partial class Appointments : ContentPage
         ScheduleResults.Add(new ScheduledTaskViewModel
         {
             AssignedTasks = allTasks.Select(t =>
-                $"Feladat sorszáma: {t.TaskID} - Deadline: {t.Deadline:yyyy-MM-dd}").ToList()
+                $" Készülék: {t.DeviceID} \n Feladat sorszáma: {t.TaskID} - Deadline: {t.Deadline:yyyy-MM-dd}").ToList()
         });
 
 
 
         FlowShopScheduleResults.Clear();
-        FlowShopScheduleResults.Add(new ScheduledTaskViewModel
-        {
-            AssignedTasks = flowSchedule
-                .SelectMany(kvp => kvp.Value)
-                .Select(t => $"Feladat sorszáma: {t.TaskID} - Deadline: {t.Deadline:yyyy-MM-dd}")
-                .ToList()
-        });
 
+        
+            FlowShopScheduleResults.Add(new ScheduledTaskViewModel
+            {
+                AssignedTasks = flowSchedule
+                .SelectMany(kvp => kvp.Value)
+                .Select(t => $" Készülék: {t.DeviceID} \n Feladat sorszáma: {t.TaskID} - Határidõ: {t.Deadline:yyyy-MM-dd}")
+                .ToList()
+            });
     }
 }

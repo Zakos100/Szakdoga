@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiApp1.HomePage"
-             Title="HomePage">
+             Title="Kezdőlap">
 
     <ScrollView>
         <VerticalStackLayout
@@ -22,6 +22,11 @@
                 FontSize="32"
                 HorizontalOptions="Center" />
 
+            <Label
+                   Text="Kérem, válasszon a menüpontok közül!"
+                   SemanticProperties.HeadingLevel="Level2"
+                   FontSize="22"
+                   HorizontalOptions="Center" />
         </VerticalStackLayout>
     </ScrollView>
 
