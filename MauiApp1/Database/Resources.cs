@@ -16,6 +16,6 @@ namespace MauiApp1.Database
         public int ResourceID { get; set; }
 
         [Column("Ability_req")]
-        public int Ability_reg { get; set; }
+        public int Ability_req { get; set; }
     }
 }

@@ -78,7 +78,7 @@ namespace MauiApp1.Scheduler
                     if (device == null || device.Device_type != suitability.Device_type)
                         return false;
 
-                    if (resource.Ability_reg < suitability.Ability_min)
+                    if (resource.Ability_req < suitability.Ability_min)
                         return false;
 
                     var userTfs = userTimeframes
@@ -175,7 +175,7 @@ namespace MauiApp1.Scheduler
                     if (device == null || device.Device_type != suitability.Device_type)
                         return false;
 
-                    if (resource.Ability_reg < suitability.Ability_min)
+                    if (resource.Ability_req < suitability.Ability_min)
                     {
                         return false;
                     }
