@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace MauiApp1.Database
 {
-    [Table("Device")]
-    public class Device
+    [Table("Devices")]
+    public class Devices
     {
         [PrimaryKey]
-        [Column("DeviceID")]
+        [Column("Device_ID")]
 
         public string DeviceID { get; set; }
 

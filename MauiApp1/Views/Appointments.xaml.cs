@@ -21,7 +21,7 @@ public partial class Appointments : ContentPage
         InitializeComponent();
         BindingContext = this;
 
-        var dbPath = System.IO.Path.Combine("D:\\egyetem\\VS\\repos\\MauiApp1\\MauiApp1", "WorkersDB");
+        var dbPath = System.IO.Path.Combine("D:\\egyetem\\VS\\repos\\MauiApp1\\MauiApp1", "WorkersDB.db");
         _localDBService = new LocalDBService(dbPath);
 
     }

@@ -57,11 +57,11 @@
 	  <None Remove="Resources\Images\more_icon.png" />
 	  <None Remove="Resources\Images\team.png" />
 	  <None Remove="Resources\Images\user.png" />
-	  <None Remove="WorkersDB" />
+	  <None Remove="." />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="WorkersDB" />
+	  <EmbeddedResource Include="WorkersDB.db" />
 	</ItemGroup>
 
 	<ItemGroup>

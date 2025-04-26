@@ -25,13 +25,13 @@ namespace MauiApp1.Database
         {
             await _database.CreateTableAsync<Tasks>();
             await _database.CreateTableAsync<Users>();
-            await _database.CreateTableAsync<Timeframe>();
+            await _database.CreateTableAsync<Timeframes>();
             await _database.CreateTableAsync<Suitability>();
             await _database.CreateTableAsync<Resources>();
-            await _database.CreateTableAsync<Database.Device>();
+            await _database.CreateTableAsync<Database.Devices>();
             await _database.CreateTableAsync<UserTimeframes>();
         }
-        public static string DB_Name { get; } = System.IO.Path.Combine("D:\\egyetem\\VS\\repos\\MauiApp1\\MauiApp1", "WorkersDB");
+        public static string DB_Name { get; } = System.IO.Path.Combine("D:\\egyetem\\VS\\repos\\MauiApp1\\MauiApp1", "WorkersDB.db");
 
         
 
@@ -51,14 +51,14 @@ namespace MauiApp1.Database
             return _connection.Table<Users>().ToList().Where(u => u.Username == username).FirstOrDefault();
         }
 
-        public Device GetDeviceByID(string deviceID)
+        public Devices GetDeviceByID(string deviceID)
         {
-            return _connection.Table<Device>().FirstOrDefault(d => d.DeviceID == deviceID);
+            return _connection.Table<Devices>().FirstOrDefault(d => d.DeviceID == deviceID);
         }
 
-        public List<Device> ListDevices()
+        public List<Devices> ListDevices()
         {
-            return _connection.Table<Device>().ToList();
+            return _connection.Table<Devices>().ToList();
 
         }
         public Task<List<Tasks>> GetTasksAsync()
@@ -71,9 +71,9 @@ namespace MauiApp1.Database
             return _database.Table<Users>().ToListAsync();
         }
 
-        public Task<List<Timeframe>> GetTimeframesAsync()
+        public Task<List<Timeframes>> GetTimeframesAsync()
         {
-            return _database.Table<Timeframe>().ToListAsync();
+            return _database.Table<Timeframes>().ToListAsync();
         }
 
         public Task<List<Suitability>> GetSuitabilitiesAsync()
@@ -86,9 +86,9 @@ namespace MauiApp1.Database
             return _database.Table<Resources>().ToListAsync();
         }
 
-        public Task<List<Device>> GetDevicesAsync()
+        public Task<List<Devices>> GetDevicesAsync()
         {
-            return _database.Table<Device>().ToListAsync();
+            return _database.Table<Devices>().ToListAsync();
         }
 
         public Task<List<UserTimeframes>> GetUserTimeframesAsync()

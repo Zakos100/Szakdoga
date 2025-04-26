@@ -12,7 +12,7 @@ namespace MauiApp1.Database
     {
         [PrimaryKey]
         [AutoIncrement]
-        [Column("TaskID")]
+        [Column("Task_ID")]
 
         public int TaskID { get; set; }
 
@@ -23,16 +23,16 @@ namespace MauiApp1.Database
         [Column("Deadline")]
         public string Deadline { get; set; }
 
-        [Column("DeviceID")]
+        [Column("Device_ID")]
         public string DeviceID { get; set; }
 
-        [Column("ResourceID")]
+        [Column("Resource_ID")]
         public int ResourceID { get; set; }
 
-        [Column("TimeframeID")]
+        [Column("Timeframe_ID")]
         public int TimeframeID { get; set; }
 
-        [Column("SuitabilityID")]
+        [Column("Suitability_ID")]
         public int SuitabilityID { get; set; }
 
         [Column("OperationTime")]

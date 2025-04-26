@@ -10,7 +10,7 @@ namespace MauiApp1;
 public partial class AboutDevices : ContentPage
 {
     [Obsolete]
-    public ObservableCollection<Database.Device> Device { get; set; } = new ObservableCollection<Database.Device>();
+    public ObservableCollection<Database.Devices> Device { get; set; } = new ObservableCollection<Database.Devices>();
 
     [Obsolete]
 

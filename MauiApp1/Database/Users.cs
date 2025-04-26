@@ -12,7 +12,7 @@ namespace MauiApp1.Database
     {
         [PrimaryKey]
         [AutoIncrement]
-        [Column("UserID")]
+        [Column("User_ID")]
 
         public int UserID { get; set; }
 
@@ -28,7 +28,7 @@ namespace MauiApp1.Database
 
         [Column("Role")]
         public string Role { get; set; }
-        [Column("DeviceID")]
+        [Column("Device_ID")]
         public string DeviceID { get; set; }
 
 

@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace MauiApp1.Database
 {
-    [Table("Datas")]
-    public class Datas
+    [Table("Data")]
+    public class Data
     {
         [PrimaryKey]
         [AutoIncrement]

@@ -13,19 +13,19 @@ namespace MauiApp1.Scheduler
     {
         private List<Tasks> tasks;
         private List<Users> users;
-        private List<Timeframe> timeframes;
+        private List<Timeframes> timeframes;
         private List<Suitability> suitabilityList;
         private List<Resources> resources;
-        private List<Database.Device> devices;
+        private List<Database.Devices> devices;
         private List<UserTimeframes> userTimeframes;
 
         public SchedulerService(
             List<Tasks> tasks,
             List<Users> users,
-            List<Timeframe> timeframes,
+            List<Timeframes> timeframes,
             List<Suitability> suitabilityList,
             List<Resources> resources,
-            List<Database.Device> devices,
+            List<Database.Devices> devices,
             List<UserTimeframes> userTimeframes)
         {
             this.tasks = tasks.OrderBy(t => t.Deadline).ToList(); // EDD sorrend

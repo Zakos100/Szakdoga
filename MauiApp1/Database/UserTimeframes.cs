@@ -12,11 +12,11 @@ namespace MauiApp1.Database
     {
         [PrimaryKey]
         [AutoIncrement]
-        [Column("UserID")]
+        [Column("User_ID")]
 
         public int UserID { get; set; }
 
-        [Column("TimeframeID")]
+        [Column("Timeframe_ID")]
 
         public int TimeFrameID { get; set; }
     }

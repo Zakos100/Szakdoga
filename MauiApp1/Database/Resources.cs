@@ -12,7 +12,7 @@ namespace MauiApp1.Database
     {
         [PrimaryKey]
         [AutoIncrement]
-        [Column("ResourceID")]
+        [Column("Resource_ID")]
         public int ResourceID { get; set; }
 
         [Column("Ability_req")]

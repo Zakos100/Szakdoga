@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace MauiApp1.Database
 {
-    [Table("Timeframe")]
-    public class Timeframe
+    [Table("Timeframes")]
+    public class Timeframes
     {
         [PrimaryKey]
         [AutoIncrement]
-        [Column("TimeframeID")]
+        [Column("Timeframe_ID")]
         public int TimeframeID { get; set; }
         [Column("StartInt")]
         public int Start { get; set; }
