@@ -11,7 +11,9 @@ namespace MauiApp1;
 public partial class Appointments : ContentPage
 {
     public ObservableCollection<ScheduledTaskViewModel> ScheduleResults { get; set; } = new();
-    public ObservableCollection<ScheduledTaskViewModel> FlowShopScheduleResults { get; set; } = new();
+    public ObservableCollection<ScheduledTaskViewModel> TabuSearchResults { get; set; } = new();
+
+    public ObservableCollection<LatenessViewModel> LatenessChart { get; set; } = new();
 
 
     private readonly LocalDBService _localDBService;
@@ -39,7 +41,7 @@ public partial class Appointments : ContentPage
         var userTimeframe = await _localDBService.GetUserTimeframesAsync();
         var scheduler = new SchedulerService(tasks, users, timeframes, suitabilityList, resources, devices, userTimeframe);
         var schedule = scheduler.AssignTasks(ScheduleMode.EDD);
-        var flowSchedule = scheduler.AssignTasks(ScheduleMode.FlowShop);
+        var tabuSchedule = scheduler.AssignTasks(ScheduleMode.TabuSearch);
 
 
         ScheduleResults.Clear();
@@ -57,16 +59,31 @@ public partial class Appointments : ContentPage
         });
 
 
-
-        FlowShopScheduleResults.Clear();
-
-        
-            FlowShopScheduleResults.Add(new ScheduledTaskViewModel
-            {
-                AssignedTasks = flowSchedule
+        TabuSearchResults.Clear();
+        TabuSearchResults.Add(new ScheduledTaskViewModel
+        {
+            AssignedTasks = tabuSchedule
                 .SelectMany(kvp => kvp.Value)
                 .Select(t => $" Készülék: {t.DeviceID} \n Feladat sorszáma: {t.TaskID} - Határidõ: {t.Deadline:yyyy-MM-dd}")
                 .ToList()
+        });
+
+
+        LatenessChart.Clear();
+
+        var sampled = scheduler.LatenessHistory
+            .Where(l => l.Iteration == 0 || l.Iteration == 10 || l.Iteration == 25 || l.Iteration == 50 || l.Iteration == 100)
+            .ToList();
+
+        foreach (var (iteration, latenessInMinutes) in sampled)
+        {
+            int latenessInDays = (int)Math.Round(latenessInMinutes / 1440.0);
+
+            LatenessChart.Add(new LatenessViewModel
+            {
+                Iteration =iteration,
+                Lateness = $"{latenessInDays} nap"
             });
+        }
     }
 }

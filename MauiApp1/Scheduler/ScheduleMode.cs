@@ -9,6 +9,6 @@ namespace MauiApp1.Scheduler
     public enum ScheduleMode
     {
         EDD,
-        FlowShop
+        TabuSearch
     }
 }

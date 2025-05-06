@@ -19,6 +19,8 @@ namespace MauiApp1.Scheduler
         private List<Database.Devices> devices;
         private List<UserTimeframes> userTimeframes;
 
+        public List<(int Iteration, int Lateness)> LatenessHistory { get; private set; } = new();
+
         public SchedulerService(
             List<Tasks> tasks,
             List<Users> users,
@@ -28,7 +30,7 @@ namespace MauiApp1.Scheduler
             List<Database.Devices> devices,
             List<UserTimeframes> userTimeframes)
         {
-            this.tasks = tasks.OrderBy(t => t.Deadline).ToList(); // EDD sorrend
+            this.tasks = tasks.OrderBy(t => t.Deadline).ToList();
             this.users = users;
             this.timeframes = timeframes;
             this.suitabilityList = suitabilityList;
@@ -39,38 +41,76 @@ namespace MauiApp1.Scheduler
 
         public Dictionary<Users, List<Tasks>> AssignTasks(ScheduleMode mode)
         {
-            if (mode == ScheduleMode.FlowShop)
+            return mode switch
             {
-                return FlowShopSchedule();
-            }
-
-            return RunEDD();
+                ScheduleMode.EDD => RunEDD(),
+                ScheduleMode.TabuSearch => TabuSearchSchedule(),
+                _ => RunEDD()
+            };
+        }
+        private string GetTaskOrderKey(List<Tasks> tasks)
+        {
+            return string.Join(",", tasks.Select(t => t.TaskID));
         }
 
-        private Dictionary<Users, List<Tasks>> FlowShopSchedule()
+        private List<List<Tasks>> GenerateNeighbors(List<Tasks> currentOrder)
+        {
+            var neighbors = new List<List<Tasks>>();
+            for (int i = 0; i < currentOrder.Count - 1; i++)
+            {
+                var copy = new List<Tasks>(currentOrder);
+                (copy[i], copy[i + 1]) = (copy[i + 1], copy[i]);
+                neighbors.Add(copy);
+            }
+            return neighbors;
+        }
+
+
+        private int EvaluateSchedule(List<Tasks> taskOrder)
+        {
+            DateTime simulatedStart = new DateTime(2025, 04, 01);
+            int currentTime = 0;
+            int totalLateness = 0;
+
+            foreach (var task in taskOrder)
+            {
+                currentTime += task.OperationTime;
+
+                if (!DateTime.TryParseExact(task.Deadline, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out DateTime deadline))
+                {
+                    totalLateness += 100000;
+                    continue;
+                }
+
+                int deadlineInMinutes = (int)((deadline - simulatedStart).TotalMinutes);
+
+                int lateness = Math.Max(0, currentTime - deadlineInMinutes);
+                totalLateness += lateness;
+            }
+
+            return totalLateness;
+        }
+
+        private Dictionary<Users, List<Tasks>> AssignTasksToUsers(List<Tasks> orderedTasks)
         {
             var schedule = new Dictionary<Users, List<Tasks>>();
+            var userFreeBlocks = new Dictionary<int, List<(int start, int end)>>();
 
-            var operationsPerTask = tasks.Select(t => new
+            foreach (var user in users)
             {
-                Task = t,
-                Op1 = new Operation { TaskID = t.TaskID, MachineIndex = 1, ProcessingTime = t.OperationTime / 2 },
-                Op2 = new Operation { TaskID = t.TaskID, MachineIndex = 2, ProcessingTime = t.OperationTime / 2 }
-            }).ToList();
+                var blocks = userTimeframes
+                    .Where(ut => ut.UserID == user.UserID)
+                    .Select(ut => timeframes.First(tf => tf.TimeframeID == ut.TimeFrameID))
+                    .Select(tf => (tf.Start * 60, tf.End * 60))
+                    .ToList();
 
-            var orderedTasks = operationsPerTask
-                .OrderBy(t => Math.Min(t.Op1.ProcessingTime, t.Op2.ProcessingTime))
-                .ThenBy(t => t.Op1.ProcessingTime < t.Op2.ProcessingTime ? 0 : 1)
-                .Select(t => t.Task)
-                .ToList();
+                userFreeBlocks[user.UserID] = blocks;
+            }
 
             foreach (var task in orderedTasks)
             {
-                var resource = resources.FirstOrDefault(r => r.ResourceID == task.ResourceID);
-                var suitability = suitabilityList.FirstOrDefault(s => s.SuitabilityID == task.SuitabilityID);
-
-                if (resource == null || suitability == null)
-                    continue;
+                var resource = resources.First(r => r.ResourceID == task.ResourceID);
+                var suitability = suitabilityList.First(s => s.SuitabilityID == task.SuitabilityID);
 
                 var eligibleUsers = users.Where(u =>
                 {
@@ -78,55 +118,72 @@ namespace MauiApp1.Scheduler
                     if (device == null || device.Device_type != suitability.Device_type)
                         return false;
 
-                    if (resource.Ability_req < suitability.Ability_min)
+                    if (!userFreeBlocks.ContainsKey(u.UserID))
                         return false;
 
-                    var userTfs = userTimeframes
-                        .Where(ut => ut.UserID == u.UserID)
-                        .Select(ut => timeframes.FirstOrDefault(tf => tf.TimeframeID == ut.TimeFrameID))
-                        .Where(tf => tf != null)
-                        .ToList();
-
-                    var totalMinutesAvailable = userTfs.Sum(tf =>
-                    {
-                        var start = tf.Start;
-                        var end = tf.End;
-                        if (end < start)
-                            return (1440 - start) + end;
-                        return end - start;
-                    });
-
-                    return totalMinutesAvailable >= task.OperationTime;
+                    return CanFitTask(userFreeBlocks[u.UserID], task.OperationTime * 60);
                 }).ToList();
 
                 if (!eligibleUsers.Any())
                     continue;
 
                 var selectedUser = eligibleUsers.OrderBy(u =>
-                {
-                    var userTfs = userTimeframes
-                        .Where(ut => ut.UserID == u.UserID)
-                        .Select(ut => timeframes.FirstOrDefault(tf => tf.TimeframeID == ut.TimeFrameID))
-                        .Where(tf => tf != null)
-                        .ToList();
-
-                    return userTfs.Sum(tf =>
-                    {
-                        var start = tf.Start;
-                        var end = tf.End;
-                        if (end < start)
-                            return (1440 - start) + end;
-                        return end - start;
-                    });
-                }).First();
+                    userFreeBlocks[u.UserID].Sum(b => b.end - b.start)).First();
 
                 if (!schedule.ContainsKey(selectedUser))
                     schedule[selectedUser] = new List<Tasks>();
 
                 schedule[selectedUser].Add(task);
+                userFreeBlocks[selectedUser.UserID] =
+                    UpdateBlocks(userFreeBlocks[selectedUser.UserID], task.OperationTime * 60);
             }
 
             return schedule;
+        }
+
+        private Dictionary<Users, List<Tasks>> TabuSearchSchedule()
+        {
+            var currentOrder = tasks.OrderBy(t => t.Deadline).ToList();
+            var bestOrder = new List<Tasks>(currentOrder);
+            int bestScore = EvaluateSchedule(bestOrder);
+
+            LatenessHistory.Clear();
+            LatenessHistory.Add((0, bestScore));
+
+            var tabuList = new Queue<string>();
+            int tabuTenure = 10;
+            int maxIterations = 100;
+
+            for (int iter = 1; iter <= maxIterations; iter++)
+            {
+                var neighbors = GenerateNeighbors(currentOrder);
+
+                var bestNeighbor = neighbors
+                    .Where(n => !tabuList.Contains(GetTaskOrderKey(n)))
+                    .OrderBy(n => EvaluateSchedule(n))
+                    .FirstOrDefault();
+
+                if (bestNeighbor == null)
+                    continue;
+
+                currentOrder = bestNeighbor;
+                int currentScore = EvaluateSchedule(currentOrder);
+
+                LatenessHistory.Add((iter, currentScore));
+
+                if (currentScore < bestScore)
+                {
+                    bestScore = currentScore;
+                    bestOrder = new List<Tasks>(currentOrder);
+                }
+
+                var key = GetTaskOrderKey(currentOrder);
+                tabuList.Enqueue(key);
+                if (tabuList.Count > tabuTenure)
+                    tabuList.Dequeue();
+            }
+
+            return AssignTasksToUsers(bestOrder);
         }
 
         private Dictionary<Users, List<Tasks>> RunEDD()
